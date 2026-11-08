@@ -2,12 +2,22 @@ use libdeflater::*;
 
 use crate::{PngError, PngResult};
 
+/// Compresses `data` as zlib. With the `parallel` feature, large data is compressed in chunks on
+/// several threads (see `libdeflater`'s `zlib_compress_parallel`), which costs a little
+/// compression; data smaller than two chunks is compressed the same either way.
 pub fn deflate(data: &[u8], level: u8, max_size: Option<usize>) -> PngResult<Vec<u8>> {
     let mut compressor = Compressor::new(CompressionLvl::new(level.into()).unwrap());
-    let capacity = max_size.unwrap_or_else(|| compressor.zlib_compress_bound(data.len()));
+    #[cfg(feature = "parallel")]
+    let bound = compressor.zlib_compress_bound_parallel(data.len());
+    #[cfg(not(feature = "parallel"))]
+    let bound = compressor.zlib_compress_bound(data.len());
+    let capacity = max_size.unwrap_or(bound);
     let mut dest = vec![0; capacity];
-    let len = compressor
-        .zlib_compress(data, &mut dest)
+    #[cfg(feature = "parallel")]
+    let result = compressor.zlib_compress_parallel(data, &mut dest);
+    #[cfg(not(feature = "parallel"))]
+    let result = compressor.zlib_compress(data, &mut dest);
+    let len = result
         .map_err(|err| match err {
             CompressionError::InsufficientSpace => PngError::DeflatedDataTooLong(capacity),
         })?;

@@ -307,8 +307,7 @@ checksum = "52ff2c0fe9bc6cb6b14a0592c2ff4fa9ceb83eea9db979b0487cd054946a2b8f"
 [[package]]
 name = "libdeflate-sys"
 version = "1.26.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7870e5fbd2766179a937c725fb11f4ca0ef025d982beb61bd3ce755425bd19c"
+source = "git+https://github.com/devongovett/libdeflater?branch=parallel#9bf65c02052b972151d40866c2fff5eab36d8ddd"
 dependencies = [
  "cc",
  "pkg-config",
@@ -317,10 +316,10 @@ dependencies = [
 [[package]]
 name = "libdeflater"
 version = "1.26.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cbb8285d2e2bd4b8d4155840ae81929354b4ba0d7b3c272c84761ffa2141e1f"
+source = "git+https://github.com/devongovett/libdeflater?branch=parallel#9bf65c02052b972151d40866c2fff5eab36d8ddd"
 dependencies = [
  "libdeflate-sys",
+ "rayon",
 ]
 
 [[package]]
